@@ -207,3 +207,4 @@ if int_put2:
      data = torch.tensor(encode(str(int_put2)), dtype=torch.long, device=device)
      data2d = data.view(1, -1)
      st.write(decode(m.generate(data2d, max_new_tokens=600)[0].tolist()))
+     st.write('finito')
