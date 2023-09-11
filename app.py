@@ -31,25 +31,54 @@ dropout = 0.0
 torch.manual_seed(1337)
 
 # wget https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt
-with open("./seqsmile.txt", 'r', encoding='utf-8') as f:
-    text = f.read()
+##with open("./seqsmile.txt", 'r', encoding='utf-8') as f:
+##    text = f.read()
 
 # here are all the unique characters that occur in this text
-chars = sorted(list(set(text)))
-vocab_size = len(chars)
+##chars = sorted(list(set(text)))
+vocab_size = 71
 # create a mapping from characters to integers
-stoi = { ch:i for i,ch in enumerate(chars) }
-itos = { i:ch for i,ch in enumerate(chars) }
-
+#stoi = { ch:i for i,ch in enumerate(chars) }
+#itos = { i:ch for i,ch in enumerate(chars) }
+stoi = {'\n': 0, ' ': 1, '#': 2, '(': 3, ')': 4,
+ '+': 5, '-': 6, '.': 7, '/': 8, '1': 9,
+ '2': 10, '3': 11, '4': 12, '5': 13, '6': 14,
+ '7': 15, '8': 16, '9': 17, '=': 18, '@': 19,
+ 'A': 20, 'B': 21, 'C': 22, 'D': 23, 'E': 24,
+ 'F': 25, 'G': 26, 'H': 27, 'I': 28, 'K': 29,
+ 'L': 30, 'M': 31, 'N': 32, 'O': 33, 'P': 34,
+ 'Q': 35, 'R': 36, 'S': 37, 'T': 38, 'U': 39,
+ 'V': 40, 'W': 41, 'X': 42, 'Y': 43, 'Z': 44,
+ '[': 45, '\\': 46, ']': 47, 'a': 48, 'b': 49,
+ 'c': 50, 'd': 51, 'e': 52, 'f': 53, 'g': 54,
+ 'h': 55, 'i': 56, 'k': 57, 'l': 58, 'm': 59,
+ 'n': 60, 'o': 61, 'p': 62, 'q': 63, 'r': 64,
+ 's': 65, 't': 66, 'u': 67, 'v': 68, 'w': 69,
+ 'y': 70}
+itos = {0: '\n', 1: ' ', 2: '#', 3: '(', 4: ')',
+ 5: '+', 6: '-', 7: '.', 8: '/', 9: '1',
+ 10: '2', 11: '3', 12: '4', 13: '5', 14: '6',
+ 15: '7', 16: '8', 17: '9', 18: '=', 19: '@',
+ 20: 'A', 21: 'B', 22: 'C', 23: 'D', 24: 'E',
+ 25: 'F', 26: 'G', 27: 'H', 28: 'I', 29: 'K',
+ 30: 'L', 31: 'M', 32: 'N', 33: 'O', 34: 'P',
+ 35: 'Q', 36: 'R', 37: 'S', 38: 'T', 39: 'U',
+ 40: 'V', 41: 'W', 42: 'X', 43: 'Y', 44: 'Z',
+ 45: '[', 46: '\\', 47: ']', 48: 'a', 49: 'b',
+ 50: 'c', 51: 'd', 52: 'e', 53: 'f', 54: 'g',
+ 55: 'h', 56: 'i', 57: 'k', 58: 'l', 59: 'm',
+ 60: 'n', 61: 'o', 62: 'p', 63: 'q', 64: 'r',
+ 65: 's', 66: 't', 67: 'u', 68: 'v', 69: 'w',
+ 70: 'y'}
 
 encode = lambda s: [stoi[c] for c in s] # encoder: take a string, output a list of integers
 decode = lambda l: ''.join([itos[i] for i in l]) # decoder: take a list of integers, output a string
 
 # Train and test splits
-data = torch.tensor(encode(text), dtype=torch.long)
-n = int(0.9*len(data)) # first 90% will be train, rest val
-train_data = data[:n]
-val_data = data[n:]
+##data = torch.tensor(encode(text), dtype=torch.long)
+##n = int(0.9*len(data)) # first 90% will be train, rest val
+##train_data = data[:n]
+##val_data = data[n:]
 
 # data loading
 def get_batch(split):
@@ -203,8 +232,21 @@ m.load_state_dict(torch.load('./ms.pt'))
 m.eval()
 
 if int_put2:
- #with st.spinner('Please wait...'):
-     data = torch.tensor(encode(str(int_put2)), dtype=torch.long, device=device)
-     data2d = data.view(1, -1)
-     st.write(decode(m.generate(data2d, max_new_tokens=600)[0].tolist()))
-     st.write('finito')
+ with st.spinner('Please wait...'):
+    data = torch.tensor(encode(str(int_put2)), dtype=torch.long, device=device)
+    data2d = data.view(1, -1)
+    input_protein = []
+    generated_smile = []
+    for i in range(0,3):
+        g = decode(m.generate(data2d, max_new_tokens=1000)[0].tolist())
+        gg = g.split()
+        generated_smile.append(gg[1])
+        input_protein.append(gg[0])
+        i+=1
+
+    df = pd.DataFrame()
+    df['generated_smile'] = generated_smile
+    df['input_protein'] = input_protein
+    df['to_ana'] = df['generated_smile'] + ' ' + df['input_protein']
+    #st.dataframe(df['generated_smile'].style.format({'value (pKi)':'{:.2f}'}))
+    st.dataframe(df['generated_smile'])
