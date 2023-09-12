@@ -244,9 +244,35 @@ if int_put2:
         input_protein.append(gg[0])
         i+=1
 
-    df = pd.DataFrame()
-    df['generated_smile'] = generated_smile
-    df['input_protein'] = input_protein
-    df['to_ana'] = df['generated_smile'] + ' ' + df['input_protein']
+    df_gen = pd.DataFrame()
+    df_gen['generated_smile'] = generated_smile
+    df_gen['input_protein'] = input_protein
+    df_gen['to_ana'] = df_gen['generated_smile'] + ' ' + df_gen['input_protein']
     #st.dataframe(df['generated_smile'].style.format({'value (pKi)':'{:.2f}'}))
-    st.dataframe(df['generated_smile'])
+    #st.dataframe(df_gen['generated_smile'])
+
+    lines = df_gen['to_ana'].values.tolist()
+    review_lines = list()
+    for line in lines:
+     review_lines.append(line)
+
+    MAX_SEQUENCE_LENGTH = 600
+
+    word_index1 = np.load('./word_index_100.npy',allow_pickle='TRUE').item()
+
+    tokenizer = Tokenizer(lower = False, char_level=True)
+    tokenizer.word_index = word_index1
+
+    sequences = tokenizer.texts_to_sequences(review_lines)
+    review_pad = pad_sequences(sequences, maxlen=MAX_SEQUENCE_LENGTH, truncating = 'post')
+
+    x_test = review_pad
+    from keras.models import load_model
+    model2 = load_model('./final_modellog.h5')
+    predict_x=model2.predict(x_test)
+    df_gen['value (pKi)'] = predict_x
+
+    df_gen2 = df_gen.sort_values(by=['value (pKi)'], ascending = False)
+    df_gen3 = df_gen2[['generated_smile', 'value (pKi)']].round(3)
+    st.title('Generated compounds:')
+    st.dataframe(df_gen3.style.format({'value (pKi)':'{:.2f}'}))
