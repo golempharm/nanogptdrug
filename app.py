@@ -14,7 +14,10 @@ st.write('')
 
 #input box
 int_put2 =  st.text_input('Sequence of protein:   e.g. MLLETQDALYVALELVIAALSVAGNVLVCAAVG...')
-
+add_slider = st.sidebar.slider(
+    'Select a number of generated compounds ',
+    0, 10, 5, 1)
+max1 =int(add_slider)
 batch_size = 16 # how many independent sequences will we process in parallel?
 block_size = 32 # what is the maximum context length for predictions?
 max_iters = 5000
@@ -237,7 +240,7 @@ if int_put2:
     data2d = data.view(1, -1)
     input_protein = []
     generated_smile = []
-    for i in range(0,3):
+    for i in range(0,max1):
         g = decode(m.generate(data2d, max_new_tokens=1000)[0].tolist())
         gg = g.split()
         generated_smile.append(gg[1])
