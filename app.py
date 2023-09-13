@@ -8,8 +8,9 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 
-
-st.title('GoLem Pharm')
+st.markdown("<h1 style='text-align: center; color: black;'>Golem Pharm</h1>", unsafe_allow_html=True)
+#st.title('GoLem Pharm')
+st.image('./nanogpt.jpeg')
 st.write('')
 
 #input box
@@ -277,5 +278,5 @@ if int_put2:
 
     df_gen2 = df_gen.sort_values(by=['value (pKi)'], ascending = False)
     df_gen3 = df_gen2[['generated_smile', 'value (pKi)']].round(3)
-    st.title('Generated compounds:')
+    st.subtitle('Generated compounds:')
     st.dataframe(df_gen3.style.format({'value (pKi)':'{:.2f}'}))
