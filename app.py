@@ -278,5 +278,5 @@ if int_put2:
 
     df_gen2 = df_gen.sort_values(by=['value (pKi)'], ascending = False)
     df_gen3 = df_gen2[['generated_smile', 'value (pKi)']].round(3)
-    st.subtitle('Generated compounds:')
+    st.title('Generated compounds:')
     st.dataframe(df_gen3.style.format({'value (pKi)':'{:.2f}'}))
